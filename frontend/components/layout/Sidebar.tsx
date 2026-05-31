@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "../context/SidebarContext";
+import { useSidebar } from "@/context/SidebarContext";
 import {
   BoxCubeIcon,
   CalenderIcon,
@@ -16,8 +16,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
-} from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
+} from "../../icons";
 
 type NavItem = {
   name: string;
@@ -100,7 +99,7 @@ const AppSidebar: React.FC = () => {
 
   const renderMenuItems = (
     navItems: NavItem[],
-    menuType: "main" | "others"
+    menuType: "main" | "others",
   ) => (
     <ul className="flex flex-col gap-4">
       {navItems.map((nav, index) => (
@@ -229,12 +228,12 @@ const AppSidebar: React.FC = () => {
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
     // Check if the current path matches any submenu item
@@ -260,7 +259,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname,isActive]);
+  }, [pathname, isActive]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -295,8 +294,8 @@ const AppSidebar: React.FC = () => {
           isExpanded || isMobileOpen
             ? "w-[290px]"
             : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+              ? "w-[290px]"
+              : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -341,7 +340,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -358,7 +357,7 @@ const AppSidebar: React.FC = () => {
 
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -374,7 +373,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );
