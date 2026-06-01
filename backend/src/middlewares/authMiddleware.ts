@@ -25,7 +25,8 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || "", (err, decoded) => {
     if (err) {
-      res.status(403).json({ status: "fail", message: "Token tidak valid atau telah kedaluwarsa" });
+      // 401 agar frontend interceptor bisa mendeteksi dan mencoba refresh token
+      res.status(401).json({ status: "fail", message: "Token tidak valid atau telah kedaluwarsa" });
       return;
     }
 

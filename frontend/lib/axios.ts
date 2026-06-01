@@ -106,17 +106,25 @@ api.interceptors.response.use(
             _retry?: boolean;
         };
 
-        // Bukan 401 atau sudah pernah di-retry → lempar error langsung
-        if (error.response?.status !== 401 || originalRequest._retry) {
+        // Bukan 401/403 atau sudah pernah di-retry → lempar error langsung
+        const status = error.response?.status;
+        if ((status !== 401 && status !== 403) || originalRequest._retry) {
+            return Promise.reject(error);
+        }
+
+        // Jangan intercept request dari endpoint auth itu sendiri
+        // (login/refresh) — hindari redirect loop
+        const requestUrl = originalRequest.url ?? "";
+        if (requestUrl.includes("/auth/login") || requestUrl.includes("/auth/refresh")) {
             return Promise.reject(error);
         }
 
         // Tidak ada refresh token di localStorage
-        // → "Keep me logged in" tidak dicentang, sesi berakhir → redirect ke login
+        // → sesi berakhir (tidak centang "Keep me logged in") → redirect login
         const refreshToken = getRefreshToken();
         if (!refreshToken) {
             clearAuth();
-            if (typeof window !== "undefined") {
+            if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
                 window.location.href = "/login";
             }
             return Promise.reject(error);

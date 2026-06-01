@@ -3,7 +3,6 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { AuthUser } from "@/types/auth";
 import React, { useState } from "react";
 import { loginUser } from "@/services/auth.service";
@@ -44,7 +43,6 @@ function Steam({ delay = "0s" }: { delay?: string }) {
 }
 
 export default function SignInForm() {
-  const router = useRouter();
   const { setUser } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -70,9 +68,10 @@ export default function SignInForm() {
       // Simpan user ke global context
       setUser(result.user);
 
-      // Redirect ke halaman sesuai role
+      // Hard navigation (bukan router.push) agar browser mengirim cookie yang
+      // baru di-set (jwtToken, userRole) ke server sebelum middleware memeriksa
       const roleHome = result.user.role === "ADMIN" ? "/" : "/kasir";
-      router.push(roleHome);
+      window.location.href = roleHome;
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ||
