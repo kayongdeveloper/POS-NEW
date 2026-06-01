@@ -57,5 +57,29 @@ export class AuthController {
     }
   };
 
+  refresh = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        res.status(400).json({ status: "fail", message: "Refresh token diperlukan" });
+        return;
+      }
+
+      const tokens = await authService.refresh(refreshToken);
+
+      res.status(200).json({
+        status: "success",
+        message: "Token berhasil diperbarui",
+        ...tokens
+      });
+    } catch (error: any) {
+      res.status(401).json({
+        status: "fail",
+        message: error.message || "Gagal memperbarui token"
+      });
+    }
+  };
+
 
 }

@@ -1,121 +1,91 @@
+"use client";
+
 import React from "react";
-// import { VectorMap } from "@react-jvectormap/core";
-import { worldMill } from "@react-jvectormap/world";
+/**
+ * CountryMap — diganti dari @react-jvectormap/core (tidak kompatibel React 18+)
+ * ke visualisasi bar chart horizontal per negara menggunakan ApexCharts
+ * yang sudah dipakai di project ini.
+ */
+import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 
-const VectorMap = dynamic(
-  () => import("@react-jvectormap/core").then((mod) => mod.VectorMap),
-  { ssr: false }
-);
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[180px] flex items-center justify-center">
+      <div className="w-6 h-6 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+    </div>
+  ),
+});
 
-// Define the component props
 interface CountryMapProps {
   mapColor?: string;
 }
 
-type MarkerStyle = {
-  initial: {
-    fill: string;
-    r: number; // Radius for markers
+const CountryMap: React.FC<CountryMapProps> = () => {
+  const options: ApexOptions = {
+    chart: {
+      type: "bar",
+      fontFamily: "Outfit, sans-serif",
+      toolbar: { show: false },
+      animations: { enabled: true, speed: 600 },
+      background: "transparent",
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        barHeight: "55%",
+        borderRadius: 6,
+        borderRadiusApplication: "end",
+        distributed: true,
+      },
+    },
+    colors: ["#465FFF", "#6B7FFF", "#8E9FFF", "#B3BFFF", "#D0D5FF"],
+    dataLabels: {
+      enabled: true,
+      formatter: (val: number) => `${val}%`,
+      style: { fontSize: "11px", fontWeight: 600, colors: ["#fff"] },
+      offsetX: -6,
+    },
+    legend: { show: false },
+    xaxis: {
+      categories: ["USA", "France", "Germany", "Japan", "Indonesia"],
+      labels: {
+        style: { fontSize: "12px", colors: "#9CA3AF" },
+        formatter: (val: string) => `${val}%`,
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      labels: {
+        style: { fontSize: "12px", fontWeight: 600, colors: "#374151" },
+      },
+    },
+    grid: {
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+      borderColor: "#F3F4F6",
+    },
+    tooltip: {
+      y: { formatter: (val: number) => `${val}% customers` },
+      theme: "light",
+    },
   };
-};
 
-type Marker = {
-  latLng: [number, number];
-  name: string;
-  style?: {
-    fill: string;
-    borderWidth: number;
-    borderColor: string;
-    stroke?: string;
-    strokeOpacity?: number;
-  };
-};
+  const series = [
+    {
+      name: "Share",
+      data: [79, 23, 18, 14, 9],
+    },
+  ];
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
   return (
-    <VectorMap
-      map={worldMill}
-      backgroundColor="transparent"
-      markerStyle={
-        {
-          initial: {
-            fill: "#465FFF",
-            r: 4, // Custom radius for markers
-          }, // Type assertion to bypass strict CSS property checks
-        } as MarkerStyle
-      }
-      markersSelectable={true}
-      markers={
-        [
-          {
-            latLng: [37.2580397, -104.657039],
-            name: "United States",
-            style: {
-              fill: "#465FFF",
-              borderWidth: 1,
-              borderColor: "white",
-              stroke: "#383f47",
-            },
-          },
-          {
-            latLng: [20.7504374, 73.7276105],
-            name: "India",
-            style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-          },
-          {
-            latLng: [53.613, -11.6368],
-            name: "United Kingdom",
-            style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-          },
-          {
-            latLng: [-25.0304388, 115.2092761],
-            name: "Sweden",
-            style: {
-              fill: "#465FFF",
-              borderWidth: 1,
-              borderColor: "white",
-              strokeOpacity: 0,
-            },
-          },
-        ] as Marker[]
-      }
-      zoomOnScroll={false}
-      zoomMax={12}
-      zoomMin={1}
-      zoomAnimate={true}
-      zoomStep={1.5}
-      regionStyle={{
-        initial: {
-          fill: mapColor || "#D0D5DD",
-          fillOpacity: 1,
-          fontFamily: "Outfit",
-          stroke: "none",
-          strokeWidth: 0,
-          strokeOpacity: 0,
-        },
-        hover: {
-          fillOpacity: 0.7,
-          cursor: "pointer",
-          fill: "#465fff",
-          stroke: "none",
-        },
-        selected: {
-          fill: "#465FFF",
-        },
-        selectedHover: {},
-      }}
-      regionLabelStyle={{
-        initial: {
-          fill: "#35373e",
-          fontWeight: 500,
-          fontSize: "13px",
-          stroke: "none",
-        },
-        hover: {},
-        selected: {},
-        selectedHover: {},
-      }}
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="bar"
+      height={200}
     />
   );
 };
