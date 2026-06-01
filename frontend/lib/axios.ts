@@ -1,47 +1,32 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-
-
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
-    withCredentials: true
-
+    withCredentials: true,
 });
 
-
-/**
- * GET ACCESS TOKEN
- */
+// ─────────────────────────────────────────────
+// TOKEN HELPERS
+// ─────────────────────────────────────────────
 
 export const setAccessToken = (token: string | null) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     if (token) {
-        localStorage.setItem('jwtToken', token);
-        // Simpan ke cookie agar bisa dibaca oleh Next.js middleware (server-side)
-        document.cookie = `jwtToken=${token}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 7}`; // 7 hari
+        localStorage.setItem("jwtToken", token);
+        document.cookie = `jwtToken=${token}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 7}`;
     } else {
-        localStorage.removeItem('jwtToken');
-        // Hapus cookie
-        document.cookie = 'jwtToken=; path=/; max-age=0';
+        localStorage.removeItem("jwtToken");
+        document.cookie = "jwtToken=; path=/; max-age=0";
     }
-}
-
-/**
- * GET ACCESS TOKEN
- */
+};
 
 export const getAccessToken = (): string | null => {
     if (typeof window === "undefined") return null;
-
     return localStorage.getItem("jwtToken");
 };
 
-/**
- * SET REFRESH TOKEN
- */
 export const setRefreshToken = (token: string | null) => {
     if (typeof window === "undefined") return;
-
     if (token) {
         localStorage.setItem("refreshToken", token);
     } else {
@@ -51,56 +36,69 @@ export const setRefreshToken = (token: string | null) => {
 
 export const getRefreshToken = (): string | null => {
     if (typeof window === "undefined") return null;
-
     return localStorage.getItem("refreshToken");
 };
 
-/**
- * SET / CLEAR USER ROLE (cookie untuk dibaca middleware)
- */
 export const setUserRole = (role: string | null) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     if (role) {
         document.cookie = `userRole=${role}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 7}`;
     } else {
-        document.cookie = 'userRole=; path=/; max-age=0';
+        document.cookie = "userRole=; path=/; max-age=0";
     }
 };
 
 export const getUserRole = (): string | null => {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
     const match = document.cookie.match(/(?:^|;\s*)userRole=([^;]*)/);
     return match ? match[1] : null;
 };
 
-/**
- * CLEAR AUTH
- */
 export const clearAuth = () => {
     setAccessToken(null);
     setRefreshToken(null);
     setUserRole(null);
 };
 
-/**
- * REQUEST INTERCEPTOR
- */
+// ─────────────────────────────────────────────
+// REQUEST INTERCEPTOR — lampirkan access token
+// ─────────────────────────────────────────────
+
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getAccessToken();
-
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-/**
- * RESPONSE INTERCEPTOR
- */
+// ─────────────────────────────────────────────
+// REFRESH TOKEN MUTEX
+// Mencegah race condition: hanya 1 refresh yang berjalan sekaligus.
+// Semua request 401 lain akan menunggu (antri) hingga refresh selesai.
+// ─────────────────────────────────────────────
+
+let isRefreshing = false;
+let refreshQueue: Array<{
+    resolve: (token: string) => void;
+    reject: (err: unknown) => void;
+}> = [];
+
+const processQueue = (error: unknown, token: string | null) => {
+    refreshQueue.forEach(({ resolve, reject }) => {
+        if (error) reject(error);
+        else resolve(token!);
+    });
+    refreshQueue = [];
+};
+
+// ─────────────────────────────────────────────
+// RESPONSE INTERCEPTOR — auto-refresh saat 401
+// ─────────────────────────────────────────────
+
 api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
@@ -108,63 +106,70 @@ api.interceptors.response.use(
             _retry?: boolean;
         };
 
-        if (
-            error.response?.status === 401 &&
-            !originalRequest._retry
-        ) {
-            originalRequest._retry = true;
-
-            try {
-                const refreshToken = getRefreshToken();
-
-                if (!refreshToken) {
-                    throw new Error("Refresh token not found");
-                }
-
-                /**
-                 * Sesuaikan endpoint refresh backend
-                 */
-                const refreshResponse = await axios.post(
-                    `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-                    {
-                        refreshToken,
-                    }
-                );
-
-                /**
-                 * Jika backend return:
-                 * {
-                 *   accessToken,
-                 *   refreshToken
-                 * }
-                 */
-                const {
-                    accessToken,
-                    refreshToken: newRefreshToken,
-                } = refreshResponse.data;
-
-                setAccessToken(accessToken);
-
-                if (newRefreshToken) {
-                    setRefreshToken(newRefreshToken);
-                }
-
-                originalRequest.headers.Authorization =
-                    `Bearer ${accessToken}`;
-
-                return api(originalRequest);
-            } catch (refreshError) {
-                clearAuth();
-
-                if (typeof window !== "undefined") {
-                    window.location.href = "/login";
-                }
-
-                return Promise.reject(refreshError);
-            }
+        // Bukan 401 atau sudah pernah di-retry → lempar error langsung
+        if (error.response?.status !== 401 || originalRequest._retry) {
+            return Promise.reject(error);
         }
 
-        return Promise.reject(error);
+        // Tidak ada refresh token di localStorage
+        // → "Keep me logged in" tidak dicentang, sesi berakhir → redirect ke login
+        const refreshToken = getRefreshToken();
+        if (!refreshToken) {
+            clearAuth();
+            if (typeof window !== "undefined") {
+                window.location.href = "/login";
+            }
+            return Promise.reject(error);
+        }
+
+        // Refresh sedang berjalan oleh request lain → antri dan tunggu hasilnya
+        if (isRefreshing) {
+            return new Promise<string>((resolve, reject) => {
+                refreshQueue.push({ resolve, reject });
+            })
+                .then((newAccessToken) => {
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return api(originalRequest);
+                })
+                .catch((err) => Promise.reject(err));
+        }
+
+        // Jalankan refresh (hanya 1 request yang boleh masuk ke blok ini)
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+            const refreshResponse = await axios.post(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`,
+                { refreshToken }
+            );
+
+            const {
+                accessToken,
+                refreshToken: newRefreshToken,
+            } = refreshResponse.data;
+
+            setAccessToken(accessToken);
+            if (newRefreshToken) {
+                setRefreshToken(newRefreshToken);
+            }
+
+            // Beritahu semua request yang sedang menunggu di antrian
+            processQueue(null, accessToken);
+
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            return api(originalRequest);
+        } catch (refreshError) {
+            // Refresh gagal → beritahu semua antrian, lalu logout
+            processQueue(refreshError, null);
+            clearAuth();
+            if (typeof window !== "undefined") {
+                window.location.href = "/login";
+            }
+            return Promise.reject(refreshError);
+        } finally {
+            isRefreshing = false;
+        }
     }
 );
 
