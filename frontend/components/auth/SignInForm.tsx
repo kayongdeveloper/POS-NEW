@@ -65,7 +65,7 @@ export default function SignInForm() {
 
     setIsLoading(true);
     try {
-      const result = await loginUser({ username: username.trim(), password });
+      const result = await loginUser({ username: username.trim(), password }, isChecked);
 
       // Simpan user ke global context
       setUser(result.user);
