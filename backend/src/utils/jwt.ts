@@ -27,7 +27,16 @@ const generateRefreshToken = (userId: number) => {
     return jwt.sign({ userId }, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 }
 
+// function to verify refresh token and return payload
+const verifyRefreshToken = (token: string): { userId: number } => {
+    if (!REFRESH_TOKEN_SECRET) {
+        throw new Error("REFRESH_TOKEN_SECRET is not defined in environment variables");
+    }
+    return jwt.verify(token, REFRESH_TOKEN_SECRET) as { userId: number };
+};
+
 export {
     generateAccessToken,
-    generateRefreshToken
+    generateRefreshToken,
+    verifyRefreshToken
 };
