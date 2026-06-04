@@ -9,7 +9,12 @@ dotenv.config();
 const app = express();
 // initialize the port number from environment variable or default to 3000
 const PORT = process.env.PORT || 3000;
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 
 app.use('/api', routers);

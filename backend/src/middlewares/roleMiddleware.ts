@@ -16,7 +16,6 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
       });
       return;
     }
-
     next();
   };
 };
