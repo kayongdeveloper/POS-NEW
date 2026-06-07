@@ -54,25 +54,21 @@ export default function SignInForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-
     if (!username.trim() || !password.trim()) {
       setErrorMsg("Username dan password wajib diisi.");
       return;
     }
-
     setIsLoading(true);
     try {
       const result = await loginUser(
         { username: username.trim(), password },
         isChecked,
       );
-
       // Simpan user ke global context
       setUser(result.user);
-
       // Hard navigation (bukan router.push) agar browser mengirim cookie yang
       // baru di-set (jwtToken, userRole) ke server sebelum middleware memeriksa
-      const roleHome = result.user.role === "ADMIN" ? "/" : "/kasir";
+      const roleHome = result.user.role === "ADMIN" ? "/" : "/KASIR";
       window.location.href = roleHome;
     } catch (err: any) {
       const msg =
