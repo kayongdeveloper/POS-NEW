@@ -37,8 +37,13 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "User",
-    openModal: true, // ← tidak pakai path
-    path: "/user"
+    path: "/user",
+  },
+
+  {
+    icon: <UserCircleIcon />,
+    name: "Transactions",
+    path: "/transactions",
   },
 
   // {
@@ -392,7 +397,6 @@ const Sidebar: React.FC = () => {
           </nav>
         </div>
       </aside>
-    <UserModal isOpen={isModalOpen} onClose={closeModal} />
     </>
   );
 };
