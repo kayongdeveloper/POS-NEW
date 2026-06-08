@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 // initialize the port number from environment variable or default to 3000
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
@@ -33,7 +33,6 @@ app.get('/up', (req: Request, res: Response) => {
     responseTime: `${responseTimeInMs}ms`
   });
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
