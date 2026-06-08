@@ -57,6 +57,27 @@ export class AuthController {
     }
   };
 
+
+  logout = async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ status: "fail", message: "Tidak ada otorisasi" });
+        return;
+      }
+      await authService.logout(req.user.userId);
+      res.status(200).json({
+        status: "success",
+        message: "Logout berhasil"
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: "fail",
+        message: error.message || "Gagal logout"
+      });
+    }
+  };
+
+
   refresh = async (req: Request, res: Response): Promise<void> => {
     try {
       const { refreshToken } = req.body;

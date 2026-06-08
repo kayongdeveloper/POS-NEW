@@ -1,11 +1,12 @@
+
 import { prisma } from "../lib/prisma.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import { loginSchema, type LoginInput } from "../validation/authValidation.js";
 
 
-export class AuthService {
 
+export class AuthService {
     async getProfile(userId: number) {
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -15,14 +16,11 @@ export class AuthService {
                 username: true,
                 role: true,
                 createdAt: true
-
             }
         });
-
         if (!user) {
             throw new Error("User tidak ditemukan");
         }
-
         return user;
     }
 
@@ -74,6 +72,10 @@ export class AuthService {
         }
     }
 
+    async logout(userId: number) {
+        // Delete all refresh tokens for this user to invalidate all sessions
+        await prisma.refreshToken.deleteMany({ where: { userId } });
+    }
 
     // refresh token method — rotasi token lama dan terbitkan pasangan token baru
     async refresh(oldRefreshToken: string) {
@@ -119,6 +121,9 @@ export class AuthService {
             refreshToken: newRefreshToken
         };
     }
+
+
+
 
 
 }
