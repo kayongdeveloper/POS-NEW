@@ -14,15 +14,19 @@ datasource db {
 
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  username  String   @unique
+  username  String    @unique
   password  String
-  role      String  @default("USER")  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  refreshTokens RefreshToken[] 
- @@map("users")
+  role      String    @default("USER")
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  refreshTokens RefreshToken[]
+  orders        Order[]
+
+  @@map("users")
 }
 
 
@@ -31,9 +35,104 @@ model RefreshToken {
   token     String   @unique
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())@map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
  @@map("refresh_tokens")
+}
+
+
+model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String?
+  email     String?
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  categoryId  Int       @map("category_id")
+  name        String
+  description String?
+  createdAt   DateTime? @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  category Category         @relation(fields: [categoryId], references: [id])
+  variants ProductVariant[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id           Int       @id @default(autoincrement())
+  productId    Int       @map("product_id")
+  sku          String    @unique
+  variantName  String    @map("variant_name")
+  costPrice    Decimal   @map("cost_price") @db.Decimal(15, 2)
+  sellingPrice Decimal   @map("selling_price") @db.Decimal(15, 2)
+  stock        Int       @default(0)
+  createdAt    DateTime? @default(now()) @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  product      Product       @relation(fields: [productId], references: [id])
+  orderDetails OrderDetail[]
+
+  @@map("product_variants")
+}
+
+model Order {
+  id            Int       @id @default(autoincrement())
+  invoiceNumber String    @unique @map("invoice_number")
+  userId        Int       @map("user_id")
+  customerId    Int?      @map("customer_id")
+  totalPrice    Decimal   @map("total_price") @db.Decimal(15, 2)
+  paymentMethod String    @map("payment_method")
+  createdAt     DateTime? @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  orderDetails OrderDetail[]
+
+  @@map("orders")
+}
+
+model OrderDetail {
+  id               Int       @id @default(autoincrement())
+  orderId          Int       @map("order_id")
+  productVariantId Int       @map("product_variant_id")
+  quantity         Int
+  sellingPrice     Decimal   @map("selling_price") @db.Decimal(15, 2)
+  subtotal         Decimal   @db.Decimal(15, 2)
+  createdAt        DateTime? @default(now()) @map("created_at")
+  updatedAt        DateTime? @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  order          Order          @relation(fields: [orderId], references: [id])
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  @@map("order_details")
 }
 
 
