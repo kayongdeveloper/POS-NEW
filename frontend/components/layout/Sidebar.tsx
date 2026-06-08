@@ -38,6 +38,7 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "User",
     openModal: true, // ← tidak pakai path
+    path: "/user"
   },
 
   // {
