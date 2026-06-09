@@ -32,6 +32,13 @@ export async function getMe(): Promise<ProfileResponse["data"]> {
 }
 
 
-export function logoutUser(): void {
-  clearAuth();
+export async function logoutUser(): Promise<void> {
+  try {
+    await api.post("/auth/logout");
+    clearAuth();
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
 }
+
+
