@@ -68,7 +68,6 @@ export class CategoryService {
     }
 
 
-
     async createCategory(data: CreateCategoryInput) {
         const validatedData = createCategorySchema.parse(data);
 
@@ -82,4 +81,23 @@ export class CategoryService {
         return category;
 
     }
+
+
+    async updateCategory(id: number, data: Partial<CreateCategoryInput>) {
+        const existingCategory = await prisma.category.findUnique({
+            where: { id }
+        });
+
+        if (!existingCategory) {
+            throw new Error("Kategori tidak ditemukan");
+        }
+        
+        const updatedCategory = await prisma.category.update({
+            where: { id },
+            data
+        });
+
+        return updatedCategory;
+    }
+
 }

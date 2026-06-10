@@ -11,7 +11,6 @@ const categoryService = new CategoryService();
 
 export class CategoryController {
 
-
     getAllCategories = async (req: Request, res: Response): Promise<void> => {
         try {
             const result = await categoryService.getAllCategories(req.query);
@@ -25,7 +24,6 @@ export class CategoryController {
             });
         }
     }
-
 
     getById = async (
         req: Request,
@@ -54,7 +52,6 @@ export class CategoryController {
         }
     };
 
-    
 
     // create category
     createCategory = async (req: Request, res: Response): Promise<void> => {
