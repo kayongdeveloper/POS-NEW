@@ -27,9 +27,8 @@ export default function NotificationDropdown() {
         onClick={handleClick}
       >
         <span
-          className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${
-            !notifying ? "hidden" : "flex"
-          }`}
+          className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${!notifying ? "hidden" : "flex"
+            }`}
         >
           <span className="absolute inline-flex w-full h-full bg-orange-400 rounded-full opacity-75 animate-ping"></span>
         </span>
@@ -114,12 +113,10 @@ export default function NotificationDropdown() {
               </span>
             </DropdownItem>
           </li>
-
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
-              className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-            >
+              className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5">
               <span className="relative block w-full h-10 rounded-full z-1 max-w-10">
                 <Image
                   width={40}
@@ -165,7 +162,11 @@ export default function NotificationDropdown() {
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
-                <span className="absolute bottom-0 right-0 z-10 h-2.5 w-full max-w-2.5 rounded-full border-[1.5px] border-white bg-success-500 dark:border-gray-900"></span>
+                <span className="absolute bottom-0 
+                right-0 z-10 h-2.5 w-full max-w-2.5 
+                rounded-full border-[1.5px] border-white
+                bg-success-500 dark:border-gray-900">
+                </span>
               </span>
 
               <span className="block">
@@ -260,7 +261,6 @@ export default function NotificationDropdown() {
               </span>
             </DropdownItem>
           </li>
-
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
