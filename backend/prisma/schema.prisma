@@ -49,9 +49,7 @@ model Customer {
   createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-
   orders Order[]
-
   @@map("customers")
 }
 
@@ -61,9 +59,7 @@ model Category {
   createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-
   products Product[]
-
   @@map("categories")
 }
 
@@ -75,10 +71,8 @@ model Product {
   createdAt   DateTime? @default(now()) @map("created_at")
   updatedAt   DateTime? @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
-
   category Category         @relation(fields: [categoryId], references: [id])
   variants ProductVariant[]
-
   @@map("products")
 }
 
@@ -93,10 +87,8 @@ model ProductVariant {
   createdAt    DateTime? @default(now()) @map("created_at")
   updatedAt    DateTime? @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
-
   product      Product       @relation(fields: [productId], references: [id])
   orderDetails OrderDetail[]
-
   @@map("product_variants")
 }
 
@@ -110,7 +102,6 @@ model Order {
   createdAt     DateTime? @default(now()) @map("created_at")
   updatedAt     DateTime? @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
-
   user         User          @relation(fields: [userId], references: [id])
   customer     Customer?     @relation(fields: [customerId], references: [id])
   orderDetails OrderDetail[]
