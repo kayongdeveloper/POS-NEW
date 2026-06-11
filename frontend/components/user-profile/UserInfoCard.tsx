@@ -5,8 +5,15 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import type { ProfileResponse } from "@/types/auth";
 
-export default function UserInfoCard() {
+type ProfileData = ProfileResponse["data"];
+
+interface UserInfoCardProps {
+  profile: ProfileData;
+}
+
+export default function UserInfoCard({ profile }: UserInfoCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     console.log("Saving changes...");
@@ -55,8 +62,8 @@ export default function UserInfoCard() {
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">First Name</p>
-            <p className="text-sm font-semibold text-gray-800 dark:text-white/90 truncate">Rendi Fitrianda</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Full Name</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white/90 truncate">{profile.name}</p>
           </div>
         </div>
 
@@ -67,8 +74,8 @@ export default function UserInfoCard() {
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Last Name</p>
-            <p className="text-sm font-semibold text-gray-800 dark:text-white/90 truncate">Chowdhury</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Username</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white/90 truncate">{profile.username}</p>
           </div>
         </div>
 
@@ -103,8 +110,8 @@ export default function UserInfoCard() {
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Bio / Role</p>
-            <p className="text-sm font-semibold text-gray-800 dark:text-white/90">Admin</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Role</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white/90">{profile.role}</p>
           </div>
         </div>
 
@@ -142,24 +149,16 @@ export default function UserInfoCard() {
                 </h5>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
-                    <Label>First Name</Label>
-                    <Input type="text" defaultValue="Rendi Fitrianda" />
+                    <Label>Full Name</Label>
+                    <Input type="text" defaultValue={profile.name} />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <Label>Last Name</Label>
-                    <Input type="text" defaultValue="Chowdhury" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Email Address</Label>
-                    <Input type="text" defaultValue="rendi.fitrianda@ui.com" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Phone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
+                    <Label>Username</Label>
+                    <Input type="text" defaultValue={profile.username} />
                   </div>
                   <div className="flex flex-col gap-1.5 lg:col-span-2">
-                    <Label>Bio / Role</Label>
-                    <Input type="text" defaultValue="Admin" />
+                    <Label>Role</Label>
+                    <Input type="text" defaultValue={profile.role} disabled />
                   </div>
                 </div>
               </div>

@@ -6,8 +6,15 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Image from "next/image";
+import type { ProfileResponse } from "@/types/auth";
 
-export default function UserMetaCard() {
+type ProfileData = ProfileResponse["data"];
+
+interface UserMetaCardProps {
+  profile: ProfileData;
+}
+
+export default function UserMetaCard({ profile }: UserMetaCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     console.log("Saving changes...");
@@ -42,21 +49,21 @@ export default function UserMetaCard() {
             {/* Name & Role */}
             <div className="flex flex-col items-center xl:items-start gap-1 xl:flex-1">
               <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                Rendi Fitrianda
+                {profile.name}
               </h4>
               <div className="flex flex-wrap items-center justify-center xl:justify-start gap-2">
                 <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                   <svg className="fill-gray-400" width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fillRule="evenodd" clipRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0zM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695z" fill=""/>
                   </svg>
-                  Team Manager
+                  {profile.role}
                 </span>
                 <span className="hidden xl:block h-3.5 w-px bg-gray-300 dark:bg-gray-700" />
                 <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                   <svg className="fill-gray-400" width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fillRule="evenodd" clipRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-2.013 3.5-4.487 3.5-7.327a6.75 6.75 0 0 0-13.5 0c0 2.84 1.556 5.314 3.5 7.327a19.583 19.583 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.144.742zM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill=""/>
                   </svg>
-                  Arizona, United States
+                  {profile.username}
                 </span>
               </div>
 
@@ -118,7 +125,7 @@ export default function UserMetaCard() {
             </div>
             <div>
               <h4 className="text-base font-semibold text-gray-800 dark:text-white/90">
-                Edit Profile
+                Edit Profile — {profile.name}
               </h4>
               <p className="text-xs text-gray-400 dark:text-gray-500">
                 Update your personal details & social links
@@ -137,24 +144,16 @@ export default function UserMetaCard() {
                 </h5>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
-                    <Label>First Name</Label>
-                    <Input type="text" defaultValue="Rendi Fitrianda" />
+                    <Label>Full Name</Label>
+                    <Input type="text" defaultValue={profile.name} />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <Label>Last Name</Label>
-                    <Input type="text" defaultValue="Fitrianda" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Email Address</Label>
-                    <Input type="text" defaultValue="rendi.fitrianda.com" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Phone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
+                    <Label>Username</Label>
+                    <Input type="text" defaultValue={profile.username} />
                   </div>
                   <div className="flex flex-col gap-1.5 lg:col-span-2">
                     <Label>Role</Label>
-                    <Input type="text" defaultValue="Admin" />
+                    <Input type="text" defaultValue={profile.role} disabled />
                   </div>
                 </div>
               </div>
