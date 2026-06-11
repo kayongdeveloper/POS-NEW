@@ -88,6 +88,8 @@ export class CategoryService {
             where: { id }
         });
 
+
+        
         if (!existingCategory) {
             throw new Error("Kategori tidak ditemukan");
         }
@@ -99,5 +101,27 @@ export class CategoryService {
 
         return updatedCategory;
     }
+
+    async deleteCategory(id: number) {
+        const existingCategory = await prisma.category.findUnique({
+            where: { id, deletedAt: null }
+        });
+
+        if (!existingCategory) {
+            throw new Error("Kategori tidak ditemukan");
+        }
+        await prisma.category.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
+
+        return {
+            status: "success",
+            message: `Kategori dengan id ${id} berhasil dihapus`
+
+        }
+       
+    }
+    
 
 }
