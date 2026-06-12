@@ -40,4 +40,4 @@ pnpm-debug.log*
 /src/generated/prisma
 
 
-/logs
+*.log
