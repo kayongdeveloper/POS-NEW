@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 };
 
 export default function KasirPage() {
+  
   return (
     <div className="space-y-6">
       {/* Header */}

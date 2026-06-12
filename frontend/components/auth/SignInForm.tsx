@@ -32,7 +32,7 @@ function CoffeeBean({ className }: { className?: string }) {
 function Steam({ delay = "0s" }: { delay?: string }) {
   return (
     <div
-      className="absolute bottom-0 w-0.5 rounded-full bg-gradient-to-t from-transparent via-amber-200/60 to-transparent"
+      className="absolute bottom-0 w-0.5 rounded-full bg-linear-to-t from-transparent via-amber-200/60 to-transparent"
       style={{
         height: "28px",
         animation: "steam 2.5s ease-in-out infinite",
@@ -68,7 +68,7 @@ export default function SignInForm() {
       setUser(result.user);
       // Hard navigation (bukan router.push) agar browser mengirim cookie yang
       // baru di-set (jwtToken, userRole) ke server sebelum middleware memeriksa
-      const roleHome = result.user.role === "ADMIN" ? "/" : "/KASIR";
+      const roleHome = result.user.role === "admin" ? "/" : "/kasir";
       window.location.href = roleHome;
     } catch (err: any) {
       const msg =
