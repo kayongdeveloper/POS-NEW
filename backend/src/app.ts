@@ -1,8 +1,10 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import routers from './routes/index.js';
+import morgan, { type StreamOptions } from 'morgan';
+import logger from './config/logger.js';
 
 dotenv.config();
 
@@ -16,6 +18,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
+
+const stream:StreamOptions = {
+  write: (message:string) => logger.info(message.trim()),
+};
+
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms', { stream }));
 
 app.use('/api', routers);
 app.get('/up', (req: Request, res: Response) => {
@@ -34,8 +43,13 @@ app.get('/up', (req: Request, res: Response) => {
   });
 });
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
+  logger.error(err.message, { stack: err.stack });
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
 app.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`);
+   logger.info(`TypeScript server running on port : http://localhost:${PORT}`);
 });
 
 
