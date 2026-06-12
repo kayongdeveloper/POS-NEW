@@ -33,7 +33,8 @@ export class AuthService {
         // find user by username 
         const user = await prisma.user.findUnique({
             where: {
-                username: validatedData.username
+                username: validatedData.username,
+                deletedAt: null
             }
         });
 
@@ -73,11 +74,11 @@ export class AuthService {
     }
 
     async logout(userId: number) {
-        // Delete all refresh tokens for this user to invalidate all sessions
+      
         await prisma.refreshToken.deleteMany({ where: { userId } });
     }
 
-    // refresh token method — rotasi token lama dan terbitkan pasangan token baru
+  
     async refresh(oldRefreshToken: string) {
         // 1. Cek apakah refresh token ada di database
         const storedToken = await prisma.refreshToken.findUnique({

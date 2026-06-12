@@ -78,7 +78,7 @@ export default function DashboardPage() {
     }).format(value);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 p-6 dark:bg-dark-gray">
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#4B2E2E]">

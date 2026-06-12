@@ -6,12 +6,16 @@ import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState ,useEffect,useRef} from "react";
+import {useProfile} from "@/hooks/useProfile";
 
 const Navbar: React.FC = () => {
+
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
+
+  const {profile} = useProfile();
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
       toggleSidebar();
@@ -169,9 +173,9 @@ const Navbar: React.FC = () => {
             {/* <!-- Notification Menu Area --> */}
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown /> 
+          {profile && <UserDropdown profile={profile} />} 
     
-        </div>
+           </div>
       </div>
     </header>
   );

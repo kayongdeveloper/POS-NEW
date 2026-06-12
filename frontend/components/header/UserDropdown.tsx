@@ -7,13 +7,24 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/dist/client/components/navigation";
 import { useRouter } from "next/navigation";
+import type { ProfileResponse } from "@/types/auth";
+type ProfileData = ProfileResponse["data"];
 
-export default function UserDropdown() {
+
+interface UserDropdownProps {
+  profile: ProfileData;
+}
+
+
+
+
+export default function UserDropdown({ profile }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { logout } = useAuth();
   const router = useRouter();
   const [logoutLoading, setLogoutLoading] = useState(false);
+
 
 
   const handleLogout = async () => {
@@ -52,7 +63,7 @@ export default function UserDropdown() {
             <Image
               width={36}
               height={36}
-              src="/images/user/owner.jpg"
+              src={"/images/user/owner.jpg"}
               alt="User"
               className="object-cover"
             />
@@ -63,10 +74,10 @@ export default function UserDropdown() {
 
         <div className="hidden text-left lg:block">
           <span className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-            Musharof
+            {profile.name}
           </span>
           <span className="block text-xs text-gray-400 dark:text-gray-500">
-            Admin
+            {profile.role}
           </span>
         </div>
 
@@ -92,11 +103,11 @@ export default function UserDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="absolute right-0 mt-3 flex w-[280px] flex-col rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900"
+        className="absolute right-0 mt-3 flex w-70 flex-col rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900"
       >
         {/* Profile Header */}
         <div className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
-          <div className="relative flex-shrink-0">
+          <div className="relative shrink-0">
             <span className="block overflow-hidden rounded-full h-12 w-12 ring-2 ring-brand-500/20">
               <Image
                 width={48}
@@ -110,13 +121,13 @@ export default function UserDropdown() {
           </div>
           <div className="flex-1 min-w-0">
             <span className="block text-sm font-semibold text-gray-800 truncate dark:text-white">
-              Musharof Chowdhury
+             {profile.name}
             </span>
             <span className="block text-xs text-gray-400 truncate dark:text-gray-500">
-              randomuser@pimjo.com
+              {profile.username}
             </span>
             <span className="mt-1 inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
-              Admin Master
+              {profile.role}
             </span>
           </div>
         </div>

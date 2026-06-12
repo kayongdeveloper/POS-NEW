@@ -115,7 +115,11 @@ api.interceptors.response.use(
         // Jangan intercept request dari endpoint auth itu sendiri
         // (login/refresh) — hindari redirect loop
         const requestUrl = originalRequest.url ?? "";
-        if (requestUrl.includes("/auth/login") || requestUrl.includes("/auth/refresh")) {
+        if (
+            requestUrl.includes("/auth/login") ||
+            requestUrl.includes("/auth/refresh") ||
+            requestUrl.includes("/auth/logout")
+        ) {
             return Promise.reject(error);
         }
 
