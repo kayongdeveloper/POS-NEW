@@ -1,53 +1,34 @@
 import { createCategorySchema, type CreateCategoryInput } from "../validation/categoryValidation.js";
-import { prisma } from "../lib/prisma.js";
-
-
-
-
-
-
-
-
+import { prisma } from "../libs/prisma.js";
+import { buildPaginationAndFilter } from '../utils/prisma-query.util.js'
+import { sendPaginatedResponse } from "../utils/response.util.js";
 
 export class CategoryService {
 
     async getAllCategories(params: { page?: number; limit?: number, search?: string }) {
-        const { page = 1, limit = 10, search } = params;
-        const skip = (page - 1) * limit;
-        const whereClause = search
-            ? {
-                name: {
-                    contains: search,
-                    mode: "insensitive" as const,
-                },
-            }
-            : {};
+
+        const { where, skip, take, limit, page, } = buildPaginationAndFilter(params, {
+            searchFields: ['name']
+        })
         const [data, total] = await Promise.all([
             prisma.category.findMany({
-                where: whereClause,
+                where,
                 skip,
-                take: limit,
+                take,
                 orderBy: { createdAt: "desc" }
             }),
             prisma.category.count({
-                where: whereClause,
+                where,
             })
         ]);
 
-        return {
-            status: "success",
-            message: "Kategori berhasil diambil",
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-                nextPage: page < Math.ceil(total / limit) ? page + 1 : null,
-                prevPage: page > 1 ? page - 1 : null,
-            },
+        return sendPaginatedResponse({
             data,
-
-        };
+            total,
+            page,
+            limit,
+            message: "get data Categories successfully "
+        })
     }
 
 
@@ -74,7 +55,6 @@ export class CategoryService {
         const category = await prisma.category.create({
             data: {
                 name: validatedData.name,
-                description: validatedData.description
             }
         });
 
@@ -89,11 +69,11 @@ export class CategoryService {
         });
 
 
-        
+
         if (!existingCategory) {
             throw new Error("Kategori tidak ditemukan");
         }
-        
+
         const updatedCategory = await prisma.category.update({
             where: { id },
             data
@@ -119,9 +99,9 @@ export class CategoryService {
             status: "success",
             message: `Kategori dengan id ${id} berhasil dihapus`
 
-        }
-       
+        };
+
     }
-    
+
 
 }

@@ -32,7 +32,7 @@ vi.mock("../../utils/jwt.js", () => ({
 }));
 
 // Import setelah mock agar mock sudah aktif
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../libs/prisma.js";
 import {
   generateAccessToken,
   generateRefreshToken,
