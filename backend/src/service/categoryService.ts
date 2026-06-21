@@ -30,7 +30,6 @@ export class CategoryService {
         })
     }
 
-
     // get category by id
     async getCategoryById(id: number) {
         const data = await prisma.category.findUnique({
@@ -101,6 +100,4 @@ export class CategoryService {
         };
 
     }
-
-
 }
