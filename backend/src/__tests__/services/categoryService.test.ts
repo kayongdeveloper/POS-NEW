@@ -14,7 +14,7 @@ vi.mock("../../lib/prisma.js", () => ({
   },
 }));
 
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../libs/prisma.js";
 import type { Mock } from "vitest";
 
 // ─── Data Dummy ───────────────────────────────────────────────────────────────

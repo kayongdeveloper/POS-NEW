@@ -1,5 +1,5 @@
 
-import { prisma } from "../lib/prisma.js";
+import { prisma } from "../libs/prisma.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import { loginSchema, type LoginInput } from "../validation/authValidation.js";
@@ -72,6 +72,7 @@ export class AuthService {
             refreshToken
         }
     }
+    
 
     async logout(userId: number) {
       
