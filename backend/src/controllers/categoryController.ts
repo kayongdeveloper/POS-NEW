@@ -2,13 +2,10 @@ import type { Request, Response } from 'express';
 import { CategoryService } from '../service/categoryService.js';
 import { ZodError } from 'zod';
 
-interface CategoryParams {
-    id: string;
-}
+
 
 
 const categoryService = new CategoryService();
-
 export class CategoryController {
 
     getAllCategories = async (req: Request, res: Response): Promise<void> => {
