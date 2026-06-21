@@ -4,7 +4,6 @@ import { buildPaginationAndFilter } from '../utils/prisma-query.util.js'
 import { sendPaginatedResponse } from "../utils/response.util.js";
 
 export class CategoryService {
-
     async getAllCategories(params: { page?: number; limit?: number, search?: string }) {
 
         const { where, skip, take, limit, page, } = buildPaginationAndFilter(params, {
